@@ -1,13 +1,16 @@
 import fastify, {FastifyInstance} from "fastify";
-import {MySQLConnection} from '@fastify/mysql'
-import {createDatabase} from "./routes/database/create-database";
-import {dropDatabase} from "./routes/database/drop-database";
-import {createUserAdmin} from "./routes/user/create-user-admin";
-import {dropUser} from "./routes/user/drop-user";
+import fastifyMysql, {MySQLPromiseConnection} from '@fastify/mysql'
+import {databaseController} from "@controller/database-controller";
+import {userController} from "@controller/user-controller";
+import {productController} from "@controller/product-controller";
+import {customerController} from "@controller/customer-controller";
+import {specialCustomerController} from "@controller/special-customer-controller";
+import {employeeController} from "@controller/employee-controller";
+import {saleController} from "@controller/sale-controller";
 
 declare module 'fastify' {
   interface FastifyInstance {
-    mysql: MySQLConnection
+    mysql: MySQLPromiseConnection
   }
 }
 
@@ -15,15 +18,22 @@ const app: FastifyInstance = fastify({
   logger: true
 })
 
-app.register(require('@fastify/mysql'), {
-  connectionString: 'mysql://root:12345@localhost/mysql'
+app.register(fastifyMysql, {
+  host: 'localhost',
+  user: 'root',
+  password: '12345',
+  type: "connection",
+  multipleStatements: true,
+  promise: true,
 })
 
-app.register(createDatabase)
-app.register(dropDatabase)
-app.register(createUserAdmin)
-app.register(dropUser)
-
+app.register(databaseController, {prefix: '/database'})
+app.register(userController, {prefix: '/user'})
+app.register(productController, {prefix: '/product'})
+app.register(customerController, {prefix: '/customer'})
+app.register(specialCustomerController, {prefix: '/special-customer'})
+app.register(employeeController, {prefix: '/employee'})
+app.register(saleController, {prefix: '/sale'})
 
 app.listen({port: 3333}, error => {
   if (error)
