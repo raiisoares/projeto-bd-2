@@ -21,7 +21,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
       await app.mysql.query(`CREATE TABLE IF NOT EXISTS customer
                              (
                                  id        INT PRIMARY KEY AUTO_INCREMENT,
-                                 name      VARCHAR(255),
+                                 name      VARCHAR(50),
                                  sex       CHAR CHECK (sex = 'f' OR sex = 'm' OR sex = 'o'),
                                  age       INT,
                                  birthdate DATE
@@ -30,7 +30,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
       await app.mysql.query(`CREATE TABLE specialCustomer
                              (
                                  id          INT PRIMARY KEY AUTO_INCREMENT,
-                                 name        VARCHAR(255),
+                                 name        VARCHAR(50),
                                  sex         CHAR CHECK (sex = 'f' OR sex = 'm' OR sex = 'o'),
                                  age         INT,
                                  id_customer INT,
@@ -41,7 +41,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
       await app.mysql.query(`CREATE TABLE employee
                              (
                                  id        INT PRIMARY KEY AUTO_INCREMENT,
-                                 name      VARCHAR(255),
+                                 name      VARCHAR(50),
                                  age       INT,
                                  sex       CHAR CHECK (sex = 'f' OR sex = 'm' OR sex = 'o'),
                                  position  VARCHAR(20) CHECK (position = 'salesman' OR position = 'manager' OR position = 'ceo'),
@@ -63,7 +63,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
       await app.mysql.query(`CREATE TABLE product
                              (
                                  id          INT PRIMARY KEY AUTO_INCREMENT,
-                                 name        VARCHAR(255),
+                                 name        VARCHAR(50),
                                  quantity    INT,
                                  description TEXT,
                                  value       DECIMAL(10, 2)
