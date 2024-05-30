@@ -1,7 +1,10 @@
 import {FastifyInstance} from "fastify";
+import {salesmanBonusTrigger} from "../triggers/salesman-bonus";
+import {customerCashbackTrigger} from "../triggers/customer-cashback";
+import {checkCustomerCashbackTrigger} from "../triggers/check_customer-cashback";
 
 export async function databaseController(app: FastifyInstance, option: any, done: () => void) {
-  app.delete('/delete-database', async (_, reply) => {
+  app.delete('/drop-database', async (_, reply) => {
     try {
       await app.mysql.execute('DROP DATABASE IF EXISTS empresa')
       reply.status(200).send("Database deleted")
@@ -32,7 +35,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
                                  age         INT,
                                  id_customer INT,
                                  cashback    DECIMAL(10, 2),
-                                 FOREIGN KEY (id_customer) REFERENCES customer (id)
+                                 FOREIGN KEY (id_customer) REFERENCES empresa.customer (id)
                              );`)
 
       await app.mysql.query(`CREATE TABLE employee
@@ -44,6 +47,17 @@ export async function databaseController(app: FastifyInstance, option: any, done
                                  position  VARCHAR(20) CHECK (position = 'salesman' OR position = 'manager' OR position = 'ceo'),
                                  salary    DECIMAL(10, 2),
                                  birthdate DATE
+                             );`)
+
+      await app.mysql.query(`CREATE TABLE specialEmployee
+                             (
+                                 id          INT PRIMARY KEY AUTO_INCREMENT,
+                                 name        VARCHAR(255),
+                                 sex         CHAR(1) CHECK (sex = 'f' OR sex = 'm' OR sex = 'o'),
+                                 age         INT,
+                                 id_employee INT,
+                                 bonus       DECIMAL(10, 2),
+                                 FOREIGN KEY (id_employee) REFERENCES empresa.employee (id)
                              );`)
 
       await app.mysql.query(`CREATE TABLE product
@@ -61,11 +75,25 @@ export async function databaseController(app: FastifyInstance, option: any, done
                                  id_salesman INT  NOT NULL,
                                  id_customer INT  NOT NULL,
                                  id_product  INT  NOT NULL,
+                                 amount      INT  NOT NULL,
                                  date        DATE NOT NULL,
-                                 FOREIGN KEY (id_salesman) REFERENCES employee (id),
-                                 FOREIGN KEY (id_customer) REFERENCES customer (id),
-                                 FOREIGN KEY (id_product) REFERENCES product (id)
+                                 FOREIGN KEY (id_salesman) REFERENCES empresa.employee (id),
+                                 FOREIGN KEY (id_customer) REFERENCES empresa.customer (id),
+                                 FOREIGN KEY (id_product) REFERENCES empresa.product (id)
                              );`)
+
+      await app.mysql.query('DROP TRIGGER IF EXISTS salesman_bonus;')
+      await app.mysql.query('DROP TRIGGER IF EXISTS customer_cashback;')
+      await app.mysql.query('DROP TRIGGER IF EXISTS check_customer_cashback;')
+
+      const salesmanBonusTriggerQuery = salesmanBonusTrigger()
+      await app.mysql.query(salesmanBonusTriggerQuery);
+
+      const customerCashbackTriggerQuery = customerCashbackTrigger()
+      await app.mysql.query(customerCashbackTriggerQuery);
+
+      const checkCustomerCashbackTriggerQuery = checkCustomerCashbackTrigger()
+      await app.mysql.query(checkCustomerCashbackTriggerQuery);
 
       reply.status(201).send({msg: "Database created"})
     } catch (err: any) {

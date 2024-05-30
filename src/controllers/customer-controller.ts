@@ -13,8 +13,7 @@ export async function customerController(app: FastifyInstance, option: any, done
     const {name, sex, age, birthdate} = createCustomerBody.parse(req.body);
 
     try {
-      await app.mysql.query('USE empresa;')
-      await app.mysql.query(`INSERT INTO customer
+      await app.mysql.query(`INSERT INTO empresa.customer
                              VALUES (null, ?, ?, ?, ?);`, [name, sex, age, birthdate])
 
       reply.status(201).send("Customer created.")
@@ -25,11 +24,10 @@ export async function customerController(app: FastifyInstance, option: any, done
 
   app.get('/find-all', async (_, reply) => {
     try {
-      await app.mysql.query('USE empresa;')
       const [customers] = await app.mysql.query(`SELECT *
-                                                FROM customer;`)
+                                                 FROM empresa.customer;`)
 
-      reply.status(200).send({data: customers})
+      reply.status(200).send({customers})
     } catch (err: any) {
       reply.status(500).send(err.message)
     }

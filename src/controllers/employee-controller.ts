@@ -4,11 +4,10 @@ export async function employeeController(app: FastifyInstance, option: any, done
 
   app.get('/find-all', async (_, reply) => {
     try {
-      await app.mysql.query('USE empresa;')
       const [employee] = await app.mysql.query(`SELECT *
-                                                FROM employee;`)
+                                                FROM empresa.employee;`)
 
-      reply.status(200).send({data: employee})
+      reply.status(200).send({employee})
     } catch (err: any) {
       reply.status(500).send(err.message)
     }

@@ -14,8 +14,7 @@ export async function productController(app: FastifyInstance, option: any, done:
     const {name, quantity, description, value} = createProductBody.parse(req.body);
 
     try {
-      await app.mysql.query('USE empresa;')
-      await app.mysql.query(`INSERT INTO product
+      await app.mysql.query(`INSERT INTO empresa.product
                              VALUES (null, ?, ?, ?, ?);`, [name, quantity, description, value])
 
       reply.status(201).send("Product created.")
@@ -26,11 +25,10 @@ export async function productController(app: FastifyInstance, option: any, done:
 
   app.get('/find-all', async (_, reply) => {
     try {
-      await app.mysql.query('USE empresa;')
       const [products] = await app.mysql.query(`SELECT *
-                                                FROM product;`)
+                                                FROM empresa.product;`)
 
-      reply.status(200).send({data: products})
+      reply.status(200).send({products})
     } catch (err: any) {
       reply.status(500).send(err.message)
     }
