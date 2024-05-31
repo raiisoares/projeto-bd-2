@@ -7,6 +7,7 @@ import {customerController} from "@controller/customer-controller";
 import {specialCustomerController} from "@controller/special-customer-controller";
 import {employeeController} from "@controller/employee-controller";
 import {saleController} from "@controller/sale-controller";
+import {cashbackController} from "@controller/cashback-controller";
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -34,6 +35,7 @@ app.register(customerController, {prefix: '/customer'})
 app.register(specialCustomerController, {prefix: '/special-customer'})
 app.register(employeeController, {prefix: '/employee'})
 app.register(saleController, {prefix: '/sale'})
+app.register(cashbackController, {prefix: '/cashback'})
 
 app.listen({port: 3333}, error => {
   if (error)

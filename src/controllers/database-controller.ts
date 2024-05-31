@@ -1,7 +1,6 @@
 import {FastifyInstance} from "fastify";
 import {salesmanBonusTrigger} from "../triggers/salesman-bonus";
 import {customerCashbackTrigger} from "../triggers/customer-cashback";
-import {checkCustomerCashbackTrigger} from "../triggers/check_customer-cashback";
 
 export async function databaseController(app: FastifyInstance, option: any, done: () => void) {
   app.delete('/drop-database', async (_, reply) => {
@@ -9,7 +8,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
       await app.mysql.execute('DROP DATABASE IF EXISTS empresa')
       reply.status(200).send("Database deleted")
     } catch (err: any) {
-      console.log(err.message)
+      reply.status(400).send({message: err.message})
     }
   })
 
@@ -82,18 +81,19 @@ export async function databaseController(app: FastifyInstance, option: any, done
                                  FOREIGN KEY (id_product) REFERENCES empresa.product (id)
                              );`)
 
+      await app.mysql.query(`CREATE TABLE delete_specialCustomer_queue
+                             (
+                                 id INT
+                             );`)
+
       await app.mysql.query('DROP TRIGGER IF EXISTS salesman_bonus;')
       await app.mysql.query('DROP TRIGGER IF EXISTS customer_cashback;')
-      await app.mysql.query('DROP TRIGGER IF EXISTS check_customer_cashback;')
 
       const salesmanBonusTriggerQuery = salesmanBonusTrigger()
       await app.mysql.query(salesmanBonusTriggerQuery);
 
       const customerCashbackTriggerQuery = customerCashbackTrigger()
       await app.mysql.query(customerCashbackTriggerQuery);
-
-      const checkCustomerCashbackTriggerQuery = checkCustomerCashbackTrigger()
-      await app.mysql.query(checkCustomerCashbackTriggerQuery);
 
       reply.status(201).send({msg: "Database created"})
     } catch (err: any) {
