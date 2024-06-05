@@ -6,5 +6,5 @@ export function TopSellingProducts () {
     JOIN sale s ON p.id = s.id_product
     GROUP BY p.name
     ORDER BY TotalQuantitySold DESC;
-  END;`
+`
 }
