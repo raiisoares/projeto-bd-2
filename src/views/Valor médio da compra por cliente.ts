@@ -5,5 +5,5 @@ export function AvgPurchaseAmountByCustomer  () {
     FROM customer c
     JOIN sale s ON c.id = s.id_customer
     GROUP BY c.name;
-  END;`
+`
 }
