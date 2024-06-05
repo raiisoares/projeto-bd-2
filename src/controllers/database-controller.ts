@@ -73,7 +73,7 @@ export async function databaseController(app: FastifyInstance, option: any, done
                                 prize_id        INT AUTO_INCREMENT PRIMARY KEY,
                                 customer_id     INT,
                                 value           DECIMAL(10, 2),
-                                FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+                                FOREIGN KEY (customer_id) REFERENCES customer(id)
                              );`)
 
       await app.mysql.query(`CREATE TABLE sale
