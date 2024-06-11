@@ -91,6 +91,6 @@ export function Estatisticas() {
         GROUP BY MONTH(date)
         ORDER BY TotalSalesSmallestMonth ASC
         LIMIT 1;
-    END
+    END;
 `
 }
