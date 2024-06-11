@@ -1,12 +1,15 @@
 import {FastifyInstance} from "fastify";
-import {salesmanBonusTrigger} from "../triggers/salesman-bonus";
-import {customerCashbackTrigger} from "../triggers/customer-cashback";
+import {salesmanBonusTrigger} from "../database/triggers/salesman-bonus";
+import {customerCashbackTrigger} from "../database/triggers/customer-cashback";
+import {products} from "../database/seed/products";
+import {employees} from "../database/seed/employees";
+import {customers} from "../database/seed/customers";
 
 export async function databaseController(app: FastifyInstance, option: any, done: () => void) {
   app.delete('/drop-database', async (_, reply) => {
     try {
       await app.mysql.execute('DROP DATABASE IF EXISTS empresa')
-      reply.status(200).send("Database deleted")
+      reply.status(200).send({msg: "Database deleted"})
     } catch (err: any) {
       reply.status(400).send({message: err.message})
     }
@@ -70,10 +73,10 @@ export async function databaseController(app: FastifyInstance, option: any, done
 
       await app.mysql.query(`CREATE TABLE prizes
                              (
-                                prize_id        INT AUTO_INCREMENT PRIMARY KEY,
-                                customer_id     INT,
-                                value           DECIMAL(10, 2),
-                                FOREIGN KEY (customer_id) REFERENCES customer(id)
+                                 prize_id    INT AUTO_INCREMENT PRIMARY KEY,
+                                 customer_id INT,
+                                 value       DECIMAL(10, 2),
+                                 FOREIGN KEY (customer_id) REFERENCES empresa.customer (id)
                              );`)
 
       await app.mysql.query(`CREATE TABLE sale
@@ -102,6 +105,15 @@ export async function databaseController(app: FastifyInstance, option: any, done
 
       const customerCashbackTriggerQuery = customerCashbackTrigger()
       await app.mysql.query(customerCashbackTriggerQuery);
+
+      const seedProducts = products();
+      await app.mysql.query(seedProducts);
+
+      const seedEmployees = employees();
+      await app.mysql.query(seedEmployees);
+
+      const seedCustomers = customers();
+      await app.mysql.query(seedCustomers);
 
       reply.status(201).send({msg: "Database created"})
     } catch (err: any) {
